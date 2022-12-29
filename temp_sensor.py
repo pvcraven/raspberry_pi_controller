@@ -59,17 +59,19 @@ class TemperatureSensor:
         self.last_sensor_send_time = 0
         # Create temp/humidity sensor object
         self.temp_sensor = get_temp_sensor(i2c)
+        self.temp_f_str = ""
+        self.hum_str = ""
 
     def update(self):
         now = time.time()
         if not self.last_sensor_send_time or now - self.last_sensor_send_time > TIME_BETWEEN_TEMP_READINGS:
             temp_f = self.temp_sensor.temperature * 9 / 5 + 32
-            temp_f_str = f"{temp_f:.1f}"
-            send_data("homeassistant/temperature", temp_f_str)
+            self.temp_f_str = f"{temp_f:.1f}"
+            send_data("homeassistant/temperature", self.temp_f_str)
 
-            hum_str = f"{self.temp_sensor.relative_humidity:.1f}"
-            send_data("homeassistant/humidity", hum_str)
+            self.hum_str = f"{self.temp_sensor.relative_humidity:.1f}"
+            send_data("homeassistant/humidity", self.hum_str)
 
-            print(temp_f_str, hum_str)
+            print(self.temp_f_str, self.hum_str)
 
             self.last_sensor_send_time = now
