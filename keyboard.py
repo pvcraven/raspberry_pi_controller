@@ -4,6 +4,26 @@ import os
 from dataclasses import dataclass
 
 
+EV_SYN = 0x00
+EV_KEY = 0x01
+EV_REL = 0x02
+EV_ABS = 0x03
+EV_MSC = 0x04
+EV_SW = 0x05
+EV_LED = 0x11
+EV_SND = 0x12
+EV_REP = 0x14
+EV_FF = 0x15
+EV_PWR = 0x16
+EV_FF_STATUS = 0x17
+EV_MAX = 0x1f
+EV_CNT = (EV_MAX+1)
+
+KEY_DOWN = 1
+KEY_REPEAT = 2
+KEY_UP = 0
+
+
 def get_keyboard_event_file(token_to_look_for):
     section = ""
     event_name = ""
@@ -48,11 +68,11 @@ def get_keyboard_event_file(token_to_look_for):
 
 @dataclass
 class KeyboardEvent:
-    seconds: int
-    microseconds: int
-    event_type: int
-    event_code: int
-    value: int
+    seconds: int = 0
+    microseconds: int = 0
+    event_type: int = 0
+    event_code: int = 0
+    value: int = 0
 
     def get_friendly_dts(self):
 
@@ -63,10 +83,13 @@ class KeyboardEvent:
 
 
 class Keyboard:
-    def __init__(self):
+    def __init__(self, blocking: bool = True):
         self.keyboard_event_file = get_keyboard_event_file("EV=120013")
+
         self.k = open(self.keyboard_event_file, "rb")
-        # self.k = os.open(self.keyboard_event_file, os.O_RDONLY|os.O_NONBLOCK)
+
+        os.set_blocking(self.k.fileno(), blocking)
+
         # The struct format reads (small L) (small L) (capital H) (capital H) (capital I)
         # Per Python, the structure format codes are as follows:
         # (small L) l - long
@@ -77,6 +100,10 @@ class Keyboard:
 
     def get_event(self):
         event_struct = self.k.read(self.event_size)
+
+        if event_struct is None:
+            return None
+
         (seconds, microseconds, event_type, event_code, value) = struct.unpack(self.struct_format, event_struct)
         event_obj = KeyboardEvent(seconds=seconds,
                                   microseconds=microseconds,

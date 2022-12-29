@@ -1,40 +1,47 @@
 import struct
 import sys
-from keyboard import Keyboard
+import keyboard
+import time
+
+from busio import I2C
+from board import SCL, SDA
+# from adafruit_ht16k33.segments import BigSeg7x4
+# from adafruit_ht16k33.segments import Seg14x4
+# from adafruit_pm25.i2c import PM25_I2C
+#
+# import paho.mqtt.publish as publish
+# import adafruit_si7021
+# import adafruit_ht16k33.segments
+
+from message_handler import send_data
+from handle_keyboard_event import handle_keyboard_event
+from temp_sensor import TemperatureSensor
 from message_handler import send_data
 
 
 def main():
-    keyboard = Keyboard()
+    # Create keyboard handler
+    keyboard_handler = keyboard.Keyboard(blocking=False)
 
-    event = keyboard.get_event()
-    going_on = True
-    while going_on and event:
+    # Create i2c handler
+    i2c = I2C(SCL, SDA, frequency=100000)
 
-        if 1 == event.event_type:
-            # It is necessary to flush the print statement or else holding multiple keys down
-            # is likely to block *output*
-            print(f"Event Type [{event.event_type}], code [{event.event_code}], value [{event.value}] at [{event.get_friendly_dts()}]", flush=True)
+    # Create temperature handler
+    temperature_handler = TemperatureSensor(i2c)
 
-            if event.event_code == 82 and event.value == 1:
-                print("Sending NUM_0")
-                send_data("NUM_0")
+    last_sensor_send_time = 0
 
-            if event.event_code == 96 and event.value == 1:
-                print("Sending ENTER")
-                send_data("ENTER")
+    done = False
+    while not done:
+        event = keyboard_handler.get_event()
+        if event:
+            handle_keyboard_event(event)
+        else:
+            time.sleep(0.2)
 
-            if event.event_code == 78 and event.value == 1:
-                print("Sending PLUS")
-                send_data("PLUS")
+        temperature_handler.update()
 
-        if 1 == event.event_code:
-            print("ESC Pressed - Quitting.")
-            going_on = False
-
-        event = keyboard.get_event()
-
-    keyboard.close()
+    keyboard_handler.close()
 
 
 if "__main__" == __name__:

@@ -1,0 +1,3 @@
+adafruit-blinka
+paho-mqtt
+adafruit-circuitpython-si7021
