@@ -1,9 +1,13 @@
+"""
+Read directly from a keyboard. Keyboard must be physically connected to the computer, and not over a network
+connection.
+"""
 from datetime import datetime
 import struct
 import os
 from dataclasses import dataclass
 
-
+# Event types. SV_KEY is used for keydown, and really the only one I'm interested in.
 EV_SYN = 0x00
 EV_KEY = 0x01
 EV_REL = 0x02
@@ -19,29 +23,34 @@ EV_FF_STATUS = 0x17
 EV_MAX = 0x1f
 EV_CNT = (EV_MAX+1)
 
+# Type of keydown event
 KEY_DOWN = 1
 KEY_REPEAT = 2
 KEY_UP = 0
 
 
-def get_keyboard_event_file(token_to_look_for):
+def get_keyboard_event_file():
+    """ Scan and find the keyboard device. """
+
+    # Keyboard should have this key token in it.
+    token_to_look_for = "EV=120013"
     section = ""
     event_name = ""
 
+    # Open a file that has a list of our input devices
     fp = open("/proc/bus/input/devices", "r")
     done = False
     while not done:
         line = fp.readline()
         if line:
-            # print (line.strip())
-            if "" == line.strip():
+            if "" == line.strip():  # Check for blank line
                 # print ("\nFound Section:\n" + section)
                 if -1 != section.find(token_to_look_for) and -1 == section.lower().find("mouse"):
                     # It is entirely possible there to be multiple devices
                     # listed as a keyboard. In this case, I will look for
                     # the word "mouse" and exclude anything that contains
                     # that. This section may need to be suited to taste
-                    print("Found [" + token_to_look_for + "] in:\n" + section)
+                    print(f"Found '{token_to_look_for}' in: {section}")
                     # Get the last part of the "Handlers" line:
                     lines = section.split('\n')
                     for section_line in lines:
@@ -68,6 +77,7 @@ def get_keyboard_event_file(token_to_look_for):
 
 @dataclass
 class KeyboardEvent:
+    """ Class to represent a keyboard event. """
     seconds: int = 0
     microseconds: int = 0
     event_type: int = 0
@@ -83,11 +93,14 @@ class KeyboardEvent:
 
 
 class Keyboard:
+    """ Class to read from a keybard """
     def __init__(self, blocking: bool = True):
-        self.keyboard_event_file = get_keyboard_event_file("EV=120013")
+        """ Set up our keyboard """
+        # Try to guess our device
+        self.keyboard_event_file = get_keyboard_event_file()
 
+        # Open file and set the blocking state
         self.k = open(self.keyboard_event_file, "rb")
-
         os.set_blocking(self.k.fileno(), blocking)
 
         # The struct format reads (small L) (small L) (capital H) (capital H) (capital I)
@@ -99,6 +112,7 @@ class Keyboard:
         self.event_size = struct.calcsize(self.struct_format)
 
     def get_event(self):
+        """ Get an event, or time out. """
         event_struct = self.k.read(self.event_size)
 
         if event_struct is None:
@@ -113,4 +127,5 @@ class Keyboard:
         return event_obj
 
     def close(self):
+        """ Close our keyboard. """
         self.k.close()

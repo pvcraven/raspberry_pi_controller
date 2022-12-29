@@ -6,9 +6,11 @@ TIME_BETWEEN_TEMP_READINGS = 120
 
 
 def get_temp_sensor(i2c):
+    """ Method to read from the temp sensor """
     # Loop to read in temp/humidity
     success = False
     sensor = None
+    # We can try to read from the sensor, but it doesn't always work. So just loop until it does.
     while not success:
         try:
             sensor = adafruit_si7021.SI7021(i2c)
