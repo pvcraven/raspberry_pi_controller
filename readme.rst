@@ -15,7 +15,7 @@ Major features:
 Running in the background on a Raspberry Pi
 
 .. code-block::
-    :title: /lib/systemd/system/update-ha.service
+    :caption: /lib/systemd/system/update-ha.service
 
     [Unit]
     Description=Update Home Assistant
