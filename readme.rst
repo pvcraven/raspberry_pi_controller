@@ -14,8 +14,9 @@ Major features:
 
 Running in the background on a Raspberry Pi
 
+Create a file `/lib/systemd/system/update-ha.service` (adjusting for your directories):
+
 .. code-block::
-   :caption: /lib/systemd/system/update-ha.service
 
     [Unit]
     Description=Update Home Assistant
@@ -28,6 +29,8 @@ Running in the background on a Raspberry Pi
 
     [Install]
     WantedBy=multi-user.target
+
+Then install, enable, and start the script:
 
 .. code-block::
 
