@@ -11,4 +11,4 @@ def send_data(topic: str,
     publish.single(topic, data,
                    auth={'username': user,
                          'password': password},
-                   hostname="homeassistant.local")
+                   hostname="192.168.1.202")

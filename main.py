@@ -46,31 +46,35 @@ def main():
 
     done = False
     while not done:
-        # Read and process keyboard events
-        if event := keyboard_handler.get_event():
-            handle_keyboard_event(event)
+        try:
+            # Read and process keyboard events
+            if event := keyboard_handler.get_event():
+                handle_keyboard_event(event)
 
-        # Read and display temp/humidity
-        # Update method will read temp and update HA every x seconds.
-        temperature_handler.update()
-        display_2.print(f"{temperature_handler.temp_f_str:>5}")
-        display_2.show()
-        display_3.print(f"{temperature_handler.hum_str:>5}")
-        display_3.show()
+            # Read and display temp/humidity
+            # Update method will read temp and update HA every x seconds.
+            temperature_handler.update()
+            display_2.print(f"{temperature_handler.temp_f_str:>5}")
+            display_2.show()
+            display_3.print(f"{temperature_handler.hum_str:>5}")
+            display_3.show()
 
-        # Create time string
-        now = datetime.datetime.now()
-        new_time_string = now.strftime("%I:%M")
-        if new_time_string[0] == '0':
-            new_time_string = ' ' + new_time_string[1:]
+            # Create time string
+            now = datetime.datetime.now()
+            new_time_string = now.strftime("%I:%M")
+            if new_time_string[0] == '0':
+                new_time_string = ' ' + new_time_string[1:]
 
-        # Update time string if needed
-        if new_time_string != time_string:
-            print(f"Time: {new_time_string}")
-            display_1.print(new_time_string)
-            time_string = new_time_string
+            # Update time string if needed
+            if new_time_string != time_string:
+                print(f"Time: {new_time_string}")
+                display_1.print(new_time_string)
+                time_string = new_time_string
 
-        # Pause so we don't chew up the CPU
+            # Pause so we don't chew up the CPU
+        except Exception as e:
+            print(f"Exception: {e}")
+
         time.sleep(0.1)
 
     keyboard_handler.close()
