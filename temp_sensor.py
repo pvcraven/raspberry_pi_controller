@@ -21,39 +21,39 @@ def get_temp_sensor(i2c):
     return sensor
 
 
-def get_sensor_readings(temp_sensor, pm25_sensor):
+# def get_sensor_readings(temp_sensor, pm25_sensor):
 
-    data = {}
+#     data = {}
 
-    for _ in range(READINGS_TO_AVERAGE):
-        try:
-            # Read air quality sensor and append data
-            air_quality_data = pm25_sensor.read()
+#     for _ in range(READINGS_TO_AVERAGE):
+#         try:
+#             # Read air quality sensor and append data
+#             air_quality_data = pm25_sensor.read()
 
-            for key, value in air_quality_data.items():
-                # print(f"{key} = {value}")
+#             for key, value in air_quality_data.items():
+#                 # print(f"{key} = {value}")
 
-                if key not in data:
-                    data[key] = []
+#                 if key not in data:
+#                     data[key] = []
 
-                data[key].append(value)
+#                 data[key].append(value)
 
-            # - Read temp/humidity and append data
-            if 'temperature' not in data:
-                data['temperature'] = []
-                data['humidity'] = []
+#             # - Read temp/humidity and append data
+#             if 'temperature' not in data:
+#                 data['temperature'] = []
+#                 data['humidity'] = []
 
-            # Temp
-            data['temperature'].append(temp_sensor.temperature * 9 / 5 + 32)
-            data['humidity'].append(temp_sensor.relative_humidity)
+#             # Temp
+#             data['temperature'].append(temp_sensor.temperature * 9 / 5 + 32)
+#             data['humidity'].append(temp_sensor.relative_humidity)
 
-        except RuntimeError as e:
-            print(f"Error {e}")
+#         except RuntimeError as e:
+#             print(f"Error {e}")
 
-        # Pause
-        time.sleep(TIME_BETWEEN_READINGS)
+#         # Pause
+#         time.sleep(TIME_BETWEEN_READINGS)
 
-    return data
+#     return data
 
 
 class TemperatureSensor:

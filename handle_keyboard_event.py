@@ -5,6 +5,23 @@ from message_handler import send_data
 state_topic = "homeassistant/macropad"
 
 
+lookup = {
+    96: "ENTER",
+    78: "PLUS",
+    1: "ESC",
+    82: "NUM_0",
+    79: "NUM_1",
+    80: "NUM_2",
+    81: "NUM_3",
+    75: "NUM_4",
+    76: "NUM_5",
+    77: "NUM_6",
+    71: "NUM_7",
+    72: "NUM_8",
+    73: "NUM_9",
+    74: "NUM_MINUS",
+
+}
 def handle_keyboard_event(event: keyboard.KeyboardEvent):
 
     if event.event_type != keyboard.EV_KEY:
@@ -16,17 +33,10 @@ def handle_keyboard_event(event: keyboard.KeyboardEvent):
     elif event.event_code == 69:
         return
 
-    elif event.event_code == 82:
-        print("Sending NUM_0")
-        send_data(state_topic, "NUM_0")
-
-    elif event.event_code == 96:
-        print("Sending ENTER")
-        send_data(state_topic, "ENTER")
-
-    elif event.event_code == 78:
-        print("Sending PLUS")
-        send_data(state_topic, "PLUS")
+    elif event.event_code in lookup:
+        val = lookup[event.event_code]
+        print(f"Sending {val}")
+        send_data(state_topic, val)
 
     elif event.event_code == 1:
         print("ESC Pressed")

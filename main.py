@@ -34,15 +34,15 @@ def main():
 
     # Create out displays
     display_1 = BigSeg7x4(i2c, address=0x70)
-    display_1.brightness = 0.3
+    display_1.brightness = 0.2
     display_1.colon = True
     time_string = ""
 
     display_2 = Seg14x4(i2c, address=0x71)
-    display_2.brightness = 0.3
+    display_2.brightness = 0.2
 
     display_3 = Seg14x4(i2c, address=0x72)
-    display_3.brightness = 0.3
+    display_3.brightness = 0.2
 
     done = False
     while not done:
@@ -71,7 +71,7 @@ def main():
             time_string = new_time_string
 
         # Pause so we don't chew up the CPU
-        time.sleep(0.2)
+        time.sleep(0.1)
 
     keyboard_handler.close()
 
