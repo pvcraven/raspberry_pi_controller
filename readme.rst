@@ -11,3 +11,29 @@ Major features:
 * Sends data to HA to trigger automations.
 * Read temperature/humidity and send to HA.
 * Update LED displays with time/temp/humidity.
+
+Running in the background on a Raspberry Pi
+
+Create a file `/lib/systemd/system/update-ha.service` (adjusting for your directories):
+
+.. code-block::
+
+    [Unit]
+    Description=Update Home Assistant
+    After=multi-user.target
+
+    [Service]
+    Type=simple
+    REstart=always
+    ExecStart=/home/pi/Macropad/venv/bin/python /home/pi/Macropad/main.py
+
+    [Install]
+    WantedBy=multi-user.target
+
+Then install, enable, and start the script:
+
+.. code-block::
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable test.service
+    sudo systemctl start test.service
